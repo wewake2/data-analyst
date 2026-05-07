@@ -417,7 +417,7 @@ Enter the token counts from any query, set the per-1M-token pricing from AWS Bed
 
 ![Query Price Calculator](assets/query_price_calculator.png)
 
-For reference: a typical query against the 170k-row ecommerce dataset costs ~10k tokens ($0.00006). Sending the same data raw to the LLM would cost ~2.6M input tokens ($7.80) per query — the code-generation approach is ~137,000x cheaper.
+For reference: a typical query against the 170k - row ecommerce dataset costs ~10k tokens ($0.00006). Sending the same data raw to the LLM would cost ~2.6M input tokens ($7.80) per query - the code - generation approach is way cheaper.
 
 ---
 
