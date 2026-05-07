@@ -1,4 +1,4 @@
-# Delly Data Analyst PoC
+# Get- PoC
 
 A PoC that lets you upload one or more CSVs, ask questions in plain English, and get back analysis, charts, and a verified explanation. Built around four sub-agents, each of which can use its own LLM. The system is designed not just to answer questions, but to be **HONEST ABOUT WHEN IT MIGHT BE WRONG**.
 

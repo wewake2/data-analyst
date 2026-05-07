@@ -32,7 +32,7 @@ configure_logging()
 # Page setup
 # -----------------------------------------------------------------------------
 st.set_page_config(
-    page_title="Delly Data Analyst",
+    page_title="Get-",
     layout="wide",
 )
 
@@ -155,7 +155,7 @@ with st.sidebar:
             del st.session_state[k]
         st.rerun()
 
-st.title("Delly Data Analyst")
+st.title("-")
 st.caption("Upload one or more CSVs. Relationships are auto-detected; "
            "confirm them before joining.")
 
