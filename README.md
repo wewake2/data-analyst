@@ -8,13 +8,13 @@ A PoC that lets you upload one or more CSVs, ask questions in plain English, and
 
 The system has four pieces working together:
 
-- Four agents — `data_insight`, `code_generation`, `execution`, `reasoning` - each with its own job and an optional per-agent LLM override.
-- Multi-CSV ingest with SQLite — upload CSVs, they get streamed into a SQLite store with chunked progress reporting.
-- Deterministic relationship discovery — pairwise column-overlap analysis to suggest foreign keys; user confirms before any are registered.
-- Dual execution engines — the LLM picks SQL or pandas per query; SQL goes through SQLite, pandas runs in a sandboxed namespace.
-- Provenance — the reasoning agent emits JSON `{text, measurements, evidence_kind, evidence_ref}` claims; a deterministic resolver checks every claim against the actual result.
-- Auto verification checks — eight server-side checks fire after every analysis (groupby totals reconcile, no surprise NaNs, referenced tables exist, etc.).
-- Retry loop — if the analysis returns suspicious empty results, code generation gets one retry with the previous code and failure reason in the prompt.
+- Four agents - `data_insight`, `code_generation`, `execution`, `reasoning` - each with its own job and an optional per-agent LLM override.
+- Multi-CSV ingest with SQLite - upload CSVs, they get streamed into a SQLite store with chunked progress reporting.
+- Deterministic relationship discovery - pairwise column-overlap analysis to suggest foreign keys; user confirms before any are registered.
+- Dual execution engines - the LLM picks SQL or pandas per query; SQL goes through SQLite, pandas runs in a sandboxed namespace.
+- Provenance - the reasoning agent emits JSON `{text, measurements, evidence_kind, evidence_ref}` claims; a deterministic resolver checks every claim against the actual result.
+- Auto verification checks - eight server-side checks fire after every analysis (groupby totals reconcile, no surprise NaNs, referenced tables exist, etc.).
+- Retry loop - if the analysis returns suspicious empty results, code generation gets one retry with the previous code and failure reason in the prompt.
 - Citations - every LLM call, every code execution, and every claim's evidence is visible in the UI.
 
 ---
@@ -85,10 +85,10 @@ data_analyst_agent/
 
 ### Key abstractions, briefly
 
-- **`LLMConfig`** has every field optional. The orchestrator merges each agent's config with the default — anything unset on the agent inherits, anything set wins. Lets you do `default=Sonnet, override(data_insight=Haiku)` cleanly.
+- **`LLMConfig`** has every field optional. The orchestrator merges each agent's config with the default - anything unset on the agent inherits, anything set wins. Lets you do `default=Sonnet, override(data_insight=Haiku)` cleanly.
 - **`AnalysisContext`** is the shared state. Every agent reads what it needs and writes its output. The orchestrator owns lifecycle.
 - **`TableStore`** wraps a SQLite database. Schema introspection, chunked ingest, foreign key registration, and `query_pandas()` for the SQL engine path.
-- **`ResolvedClaim`** is the unit of provenance — text + evidence reference + resolved value + grounding status.
+- **`ResolvedClaim`** is the unit of provenance - text + evidence reference + resolved value + grounding status.
 
 ---
 
@@ -176,9 +176,9 @@ Replace freeform "explain this result" prose with:
 
 A deterministic resolver: for each claim, walk the path against the actual result, extract numbers from the `measurements` field, and check they match. Six evidence kinds cover most cases: `cell`, `row`, `column`, `scalar`, `shape`, `stat`.
 
-WIN : catches LLM hallucination of specific numbers without LLM-on-LLM judging. The verifier is deterministic — if it says a claim doesn't ground, it doesn't ground.
+WIN : catches LLM hallucination of specific numbers without LLM-on-LLM judging. The verifier is deterministic - if it says a claim doesn't ground, it doesn't ground.
 
-The Subtlety: the LLM must declare which numbers in the text are *measurements* vs *labels* ("January 2025" — 2025 is a label). Without this distinction, you get false positives on every date claim.
+The Subtlety: the LLM must declare which numbers in the text are *measurements* vs *labels* ("January 2025" - 2025 is a label). Without this distinction, you get false positives on every date claim.
 
 ### 3. Deterministic relationship discovery
 
@@ -210,11 +210,11 @@ A naive retry loop ("it failed, try again") burns tokens. The version that earne
 - Caps at 1 retry for PoC - can be set according the complexity
 - Reasoning runs *once*, on the final state, so you don't pay for explanation twice
 
-The trigger condition is the important part. Don't retry on every empty result — sometimes empty is correct.
+The trigger condition is the important part. Don't retry on every empty result - sometimes empty is correct.
 
 ## WIP
 ### 6. The verification sandbox
-The **on-demand** verification buttons (`describe()`, sample re-run, row counts). They give the user a way to cross-check the agent's claims against ground truth, deterministically. Keep humans in the loop for high-stakes verification — automatic verification can only check structural consistency.
+The **on-demand** verification buttons (`describe()`, sample re-run, row counts). They give the user a way to cross-check the agent's claims against ground truth, deterministically. Keep humans in the loop for high-stakes verification - automatic verification can only check structural consistency.
 
 The **automatic** checks should be deterministic and cheap. The eight checks we have:
 
@@ -225,7 +225,7 @@ The **automatic** checks should be deterministic and cheap. The eight checks we 
 5. Referenced columns exist
 6. No surprise NaNs (input had none, result does)
 7. Row count plausible (aggregate doesn't return more rows than input)
-8. Groupby totals reconcile (sum across groups matches input column sum) — **the most valuable one**
+8. Groupby totals reconcile (sum across groups matches input column sum) - **the most valuable one**
 
 #8 is the only check that does real cross-validation math. Reproduce it in your system if nothing else.
 
@@ -239,7 +239,7 @@ These are in rough order of "things I'd flag to anyone building something simila
 
 ### LLMs lie about empty results
 
-The most expensive failure mode we hit. The LLM writes broken SQL (wrong join condition, wrong column name), the query returns 0 rows, and the LLM **confidently narrates the emptiness** — "the order_items table appears to be empty" — when the table has 43k rows.
+The most expensive failure mode we hit. The LLM writes broken SQL (wrong join condition, wrong column name), the query returns 0 rows, and the LLM **confidently narrates the emptiness** - "the order_items table appears to be empty" - when the table has 43k rows.
 
 Fix: make empty/None results trigger a code-generation retry, not a reasoning narration. In the reasoning prompt, explicitly forbid empty-data claims unless the result genuinely is empty AND the original SQL is sane.
 
@@ -252,7 +252,7 @@ When we added `register_foreign_key`, the original implementation did this:
 2. Create new `child_table` with FK constraint
 3. INSERT data back from `_tmp_*`
 
-With `PRAGMA foreign_keys = ON`, the INSERT silently rejected rows whose foreign key referent didn't exist yet. We ended up with empty real tables and full `_tmp_*` shadows — and the agent got "no data" for every joined query.
+With `PRAGMA foreign_keys = ON`, the INSERT silently rejected rows whose foreign key referent didn't exist yet. We ended up with empty real tables and full `_tmp_*` shadows - and the agent got "no data" for every joined query.
 
 The lesson: any data-mutating step needs a check. Silent row loss is the worst kind of bug.
 
@@ -263,7 +263,7 @@ Early version of the verifier treated *every* number in a claim as a measurement
 - "**75%** of products are at or below $210" → `75` not found
 - "Across **11** months" → `11` not found
 
-Fix : start with regex heuristics (years, percentile labels). Then realising this never ends — there's always a new label pattern. The structural fix is to have the **LLM declare measurements explicitly** in the claim schema. Then the verifier doesn't guess.
+Fix : start with regex heuristics (years, percentile labels). Then realising this never ends - there's always a new label pattern. The structural fix is to have the **LLM declare measurements explicitly** in the claim schema. Then the verifier doesn't guess.
 
 The heuristic stays as a fallback for when the LLM forgets the field.
 
@@ -285,14 +285,14 @@ This requires the LLM to think about the claim's *measurements* independently fr
 
 When 6 tables are loaded but only one is needed for a query, smaller LLMs default to writing `df.groupby(...)` from training-data muscle memory. The execution namespace doesn't have `df`, only `dfs["products"]`.
 
-Fix: two changes — (a) the namespace exposes `df` whenever the *plan* says one table is needed (not just when one table is loaded), and (b) the prompt explicitly forbids `df` and provides worked examples using `dfs["..."]`.
+Fix: two changes - (a) the namespace exposes `df` whenever the *plan* says one table is needed (not just when one table is loaded), and (b) the prompt explicitly forbids `df` and provides worked examples using `dfs["..."]`.
 
 ### SQLite's ( Databases) silent failure modes
 
 Beyond the FK-INSERT problem, SQLite has other quiet ways to lose data:
-- `PRAGMA foreign_keys` is OFF by default — turn it on intentionally
+- `PRAGMA foreign_keys` is OFF by default - turn it on intentionally
 - `to_sql(if_exists="append")` doesn't validate column order
-- `pd.read_csv` with the pyarrow engine doesn't honor `chunksize` — use the C engine for chunked reads
+- `pd.read_csv` with the pyarrow engine doesn't honor `chunksize` - use the C engine for chunked reads
 
 Each one of these caused at least one debugging session.
 
@@ -430,7 +430,7 @@ How it will be integrated with getdelly.com
 - Real sandboxing. The current "restricted builtins + import blocklist" is best-effort and not a security boundary. Use a container.
 - Replace SQLite with DuckDB/PostgresQL. Same SQL surface, much better analytical performance, native pandas integration, real window functions.
 - Cache the data-insight summary across questions. It rarely changes between turns and it's the most expensive non-execution cost.
-- Add measurement-level provenance from arithmetic. Right now we verify "this number appears in the result." A stronger version verifies "this number is the sum/mean/max of these other cells" — full computational provenance. High on the deterministic scale.
+- Add measurement-level provenance from arithmetic. Right now we verify "this number appears in the result." A stronger version verifies "this number is the sum/mean/max of these other cells" - full computational provenance. High on the deterministic scale.
 - Streaming responses. Current pipeline is fully synchronous..
 
 The architecture supports all of these as drop-in changes.
