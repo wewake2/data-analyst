@@ -1,0 +1,6 @@
+data_analyst/
+data_analyst_agent/.env
+data_analyst_agent/core/__pycache__
+data_analyst_agent/__pycache__
+data_analyst_agent/agents/__pycache__
+pages/__pycache__

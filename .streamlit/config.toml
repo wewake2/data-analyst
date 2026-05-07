@@ -1,0 +1,12 @@
+[server]
+# CSVs up to 500 MB; small headroom for protocol overhead.
+maxUploadSize = 550
+# WebSocket message size also matters when streaming chunks back to client.
+maxMessageSize = 550
+enableWebsocketCompression = true
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+base = "light"
