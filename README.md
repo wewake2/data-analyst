@@ -65,7 +65,7 @@ data_analyst_agent/
 ├── app.py                        # Streamlit UI
 ├── core/
 │   ├── llm.py                    # LLMConfig + per-agent override + providers
-│   │                             # (Anthropic/OpenAI/AWS Bedrock/Mock)
+│   │                             # AWS Bedrock
 │   ├── table_store.py            # SQLite-backed table registry + FK migration
 │   ├── relationships.py          # Deterministic relationship discovery
 │   ├── data_io.py                # CSV loader with dtype optimisation
@@ -80,7 +80,7 @@ data_analyst_agent/
 │   ├── code_generation.py        # Splits into 3 sub-prompts
 │   ├── execution.py              # Restricted-builtin sandbox
 │   └── reasoning.py              # Emits structured claims
-└── examples/demo.py              # Offline end-to-end demo (uses MockLLM)
+└── examples/demo.py
 ```
 
 ### Key abstractions, briefly
