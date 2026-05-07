@@ -229,6 +229,8 @@ The **automatic** checks should be deterministic and cheap. The eight checks we 
 
 #8 is the only check that does real cross-validation math. Reproduce it in your system if nothing else.
 
+![Verification Tab](assets/verification.png)
+
 ---
 
 ## Observations
