@@ -409,6 +409,18 @@ Should print `pass` for the first, `warn` for the second. If both pass, the grou
 
 ---
 
+## Query Price Calculator
+
+Every query displays its token consumption (input / output / total) inline. To estimate the actual cost, use the built-in price calculator page at `/query_price_calculator`.
+
+Enter the token counts from any query, set the per-1M-token pricing from AWS Bedrock, and get the cost in both USD and INR (with a configurable conversion rate).
+
+![Query Price Calculator](assets/query_price_calculator.png)
+
+For reference: a typical query against the 170k-row ecommerce dataset costs ~10k tokens ($0.00006). Sending the same data raw to the LLM would cost ~2.6M input tokens ($7.80) per query — the code-generation approach is ~137,000x cheaper.
+
+---
+
 ## What we'd do next
 
 How it will be integrated with getdelly.com
